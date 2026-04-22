@@ -9,16 +9,13 @@ import {
   Feed,
   NotFound404
 } from '@pages';
-import styles from './app.module.css';
-
-import { AppHeader } from '@components';
+import { Layout } from '@components';
 import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from '../routes/protected-route';
 import { PublicRoute } from '../routes/public-route';
 
 const App = () => (
-  <div className={styles.app}>
-    <AppHeader />
+  <Layout>
     <Routes>
       {/* Публичные роуты */}
       <Route path='/' element={<ConstructorPage />} />
@@ -79,7 +76,7 @@ const App = () => (
       {/* 404 */}
       <Route path='*' element={<NotFound404 />} />
     </Routes>
-  </div>
+  </Layout>
 );
 
 export default App;
