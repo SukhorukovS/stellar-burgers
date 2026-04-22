@@ -1,33 +1,85 @@
 import { ConstructorPage } from '@pages';
+import {
+  Login,
+  Register,
+  ForgotPassword,
+  ResetPassword,
+  Profile,
+  ProfileOrders,
+  Feed,
+  NotFound404
+} from '@pages';
 import styles from './app.module.css';
 
 import { AppHeader } from '@components';
-import { Preloader } from '@ui';
+import { Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from '../routes/protected-route';
+import { PublicRoute } from '../routes/public-route';
 
-const App = () => {
-  /** TODO: взять переменные из стора */
-  const isIngredientsLoading = false;
-  const ingredients = [];
-  const error = null;
+const App = () => (
+  <div className={styles.app}>
+    <AppHeader />
+    <Routes>
+      {/* Публичные роуты */}
+      <Route path='/' element={<ConstructorPage />} />
+      <Route path='/feed' element={<Feed />} />
 
-  return (
-    <div className={styles.app}>
-      <AppHeader />
-      {isIngredientsLoading ? (
-        <Preloader />
-      ) : error ? (
-        <div className={`${styles.error} text text_type_main-medium pt-4`}>
-          {error}
-        </div>
-      ) : ingredients.length > 0 ? (
-        <ConstructorPage />
-      ) : (
-        <div className={`${styles.title} text text_type_main-medium pt-4`}>
-          Нет игредиентов
-        </div>
-      )}
-    </div>
-  );
-};
+      {/* Защищённые роуты (только для неавторизованных) */}
+      <Route
+        path='/login'
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path='/register'
+        element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path='/forgot-password'
+        element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path='/reset-password'
+        element={
+          <PublicRoute>
+            <ResetPassword />
+          </PublicRoute>
+        }
+      />
+
+      {/* Защищённые роуты (только для авторизованных) */}
+      <Route
+        path='/profile'
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/profile/orders'
+        element={
+          <ProtectedRoute>
+            <ProfileOrders />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 404 */}
+      <Route path='*' element={<NotFound404 />} />
+    </Routes>
+  </div>
+);
 
 export default App;
