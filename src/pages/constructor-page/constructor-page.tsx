@@ -6,12 +6,11 @@ import { BurgerIngredients } from '../../components';
 import { BurgerConstructor } from '../../components';
 import { Preloader } from '../../components/ui';
 import { FC } from 'react';
+import { getError, getLoading } from '../../services/slices/ingredients';
 
 export const ConstructorPage: FC = () => {
-  /** TODO: взять переменные из стора */
-  const isIngredientsLoading = false;
-  const ingredients = [];
-  const error = null;
+  const isIngredientsLoading = useSelector(getLoading);
+  const error = useSelector(getError);
 
   if (isIngredientsLoading) {
     return <Preloader />;

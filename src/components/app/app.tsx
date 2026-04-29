@@ -19,11 +19,23 @@ import {
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '../routes/protected-route';
 import { PublicRoute } from '../routes/public-route';
+import { useEffect, useRef } from 'react';
+import { fetchIngredients } from '../../services/slices/ingredients';
+import { useDispatch } from '../../services/store';
 
 const App = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
+  const didInit = useRef(false);
 
   const backgroundLocation = location.state?.backgroundLocation;
+
+  useEffect(() => {
+    if (!didInit.current) {
+      dispatch(fetchIngredients());
+      didInit.current = true;
+    }
+  }, []);
 
   return (
     <Layout>
