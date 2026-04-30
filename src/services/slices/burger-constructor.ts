@@ -25,6 +25,9 @@ export const burgerConstructorSlice = createSlice({
   reducers: {
     addBun: (state, action: { payload: TBun }) => {
       state.constructorItems.bun = action.payload;
+    },
+    addIngredient: (state, action: { payload: TConstructorIngredient }) => {
+      state.constructorItems.ingredients.push(action.payload);
     }
   },
   selectors: {
@@ -34,6 +37,6 @@ export const burgerConstructorSlice = createSlice({
 
 export const burgerConstructorReducer = burgerConstructorSlice.reducer;
 
-export const { addBun } = burgerConstructorSlice.actions;
+export const { addBun, addIngredient } = burgerConstructorSlice.actions;
 
 export const { getConstructorItems } = burgerConstructorSlice.selectors;
