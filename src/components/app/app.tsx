@@ -22,6 +22,8 @@ import { PublicRoute } from '../routes/public-route';
 import { useEffect, useRef } from 'react';
 import { fetchIngredients } from '../../services/slices/ingredients';
 import { useDispatch } from '../../services/store';
+import { ROUTES } from '../routes/types';
+import { fetchFeeds } from '@slices/feeds';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -33,6 +35,7 @@ const App = () => {
   useEffect(() => {
     if (!didInit.current) {
       dispatch(fetchIngredients());
+      dispatch(fetchFeeds());
       didInit.current = true;
     }
   }, []);
@@ -41,8 +44,8 @@ const App = () => {
     <Layout>
       <Routes location={location}>
         {/* Публичные роуты */}
-        <Route path='/' element={<ConstructorPage />} />
-        <Route path='/feed' element={<Feed />} />
+        <Route path={ROUTES.MAIN} element={<ConstructorPage />} />
+        <Route path={ROUTES.FEED} element={<Feed />} />
         <Route path='/feed/:number' element={<OrderInfo />} />
         <Route path='/ingredients/:id' element={<IngredientDetails />} />
 
