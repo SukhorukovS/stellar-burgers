@@ -28,6 +28,27 @@ export const burgerConstructorSlice = createSlice({
     },
     addIngredient: (state, action: { payload: TConstructorIngredient }) => {
       state.constructorItems.ingredients.push(action.payload);
+    },
+    removeIngredientByIndex: (state, action) => {
+      state.constructorItems.ingredients.splice(action.payload, 1);
+    },
+    moveIngredientUp: (state, action) => {
+      [
+        state.constructorItems.ingredients[action.payload],
+        state.constructorItems.ingredients[action.payload - 1]
+      ] = [
+        state.constructorItems.ingredients[action.payload - 1],
+        state.constructorItems.ingredients[action.payload]
+      ];
+    },
+    moveIngredientDown: (state, action) => {
+      [
+        state.constructorItems.ingredients[action.payload],
+        state.constructorItems.ingredients[action.payload + 1]
+      ] = [
+        state.constructorItems.ingredients[action.payload + 1],
+        state.constructorItems.ingredients[action.payload]
+      ];
     }
   },
   selectors: {
@@ -37,6 +58,12 @@ export const burgerConstructorSlice = createSlice({
 
 export const burgerConstructorReducer = burgerConstructorSlice.reducer;
 
-export const { addBun, addIngredient } = burgerConstructorSlice.actions;
+export const {
+  addBun,
+  addIngredient,
+  removeIngredientByIndex,
+  moveIngredientUp,
+  moveIngredientDown
+} = burgerConstructorSlice.actions;
 
 export const { getConstructorItems } = burgerConstructorSlice.selectors;
