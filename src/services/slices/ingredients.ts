@@ -1,6 +1,11 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector
+} from '@reduxjs/toolkit';
 import { TIngredient } from '../../utils/types';
 import { getIngredientsApi } from '../../utils/burger-api';
+import { RootState } from '../store';
 
 type TIngredientsState = {
   ingredients: TIngredient[];
@@ -25,13 +30,7 @@ export const ingredientsSlice = createSlice({
   selectors: {
     getIngredients: (state) => state.ingredients,
     getLoading: (state) => state.isLoading,
-    getError: (state) => state.error,
-    getBuns: (state) =>
-      state.ingredients.filter((ingredient) => ingredient.type === 'bun'),
-    getMains: (state) =>
-      state.ingredients.filter((ingredient) => ingredient.type === 'main'),
-    getSauces: (state) =>
-      state.ingredients.filter((ingredient) => ingredient.type === 'sauce')
+    getError: (state) => state.error
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -54,11 +53,17 @@ export const ingredientsSlice = createSlice({
 });
 
 export const ingredientsReducer = ingredientsSlice.reducer;
-export const {
-  getIngredients,
-  getLoading,
-  getError,
-  getBuns,
-  getMains,
-  getSauces
-} = ingredientsSlice.selectors;
+export const { getIngredients, getLoading, getError } =
+  ingredientsSlice.selectors;
+
+export const getBuns = createSelector([getIngredients], (ingredients) =>
+  ingredients.filter((ingredient) => ingredient.type === 'bun')
+);
+
+export const getMains = createSelector([getIngredients], (ingredients) =>
+  ingredients.filter((ingredient) => ingredient.type === 'main')
+);
+
+export const getSauces = createSelector([getIngredients], (ingredients) =>
+  ingredients.filter((ingredient) => ingredient.type === 'sauce')
+);
