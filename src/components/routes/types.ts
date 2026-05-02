@@ -1,4 +1,5 @@
 export enum ROUTES {
   MAIN = '/',
-  FEED = '/feed'
+  FEED = '/feed',
+  LOGIN = '/login'
 }
