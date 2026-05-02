@@ -22,6 +22,9 @@ const initialState: TUserState = {
 export const userSlice = createSlice({
   name: 'user',
   initialState,
+  selectors: {
+    getUser: (state) => state.user
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchUser.pending, (state) => {
@@ -41,3 +44,5 @@ export const userSlice = createSlice({
 });
 
 export const userReducer = userSlice.reducer;
+
+export const { getUser } = userSlice.selectors;
