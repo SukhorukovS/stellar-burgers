@@ -24,6 +24,7 @@ import { fetchIngredients } from '../../services/slices/ingredients';
 import { useDispatch } from '../../services/store';
 import { ROUTES } from '../routes/types';
 import { fetchFeeds } from '@slices/feeds';
+import { fetchUser } from '@slices/user';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ const App = () => {
     if (!didInit.current) {
       dispatch(fetchIngredients());
       dispatch(fetchFeeds());
+      dispatch(fetchUser());
       didInit.current = true;
     }
   }, []);
