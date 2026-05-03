@@ -1,5 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { TConstructorIngredient } from '@utils-types';
+import { orderBurgerApi } from '@api';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { TConstructorIngredient, TOrder } from '@utils-types';
 
 type TBun = {
   price: number;
@@ -8,16 +9,27 @@ type TBun = {
   id: string;
 } | null;
 
-type TConstructorItems = {
+type TConstructorBurger = {
   constructorItems: {
     bun: TBun;
     ingredients: TConstructorIngredient[];
   };
+  error: string | null;
+  orderRequest: boolean;
+  orderData: TOrder | null;
 };
 
-const initialState: TConstructorItems = {
+const initialState: TConstructorBurger = {
+  orderRequest: false,
+  error: null,
+  orderData: null,
   constructorItems: { bun: null, ingredients: [] }
 };
+
+export const orderBurger = createAsyncThunk(
+  'burger/orderBurger',
+  async (data: string[]) => await orderBurgerApi(data)
+);
 
 export const burgerConstructorSlice = createSlice({
   name: 'burgerConstructor',
@@ -52,7 +64,24 @@ export const burgerConstructorSlice = createSlice({
     }
   },
   selectors: {
-    getConstructorItems: (state) => state.constructorItems
+    getConstructorItems: (state) => state.constructorItems,
+    getNewOrder: (state) => state.orderData,
+    getOrderRequest: (state) => state.orderRequest
+  },
+  extraReducers(builder) {
+    builder.addCase(orderBurger.pending, (state) => {
+      state.error = null;
+      state.orderRequest = true;
+    });
+    builder.addCase(orderBurger.fulfilled, (state, action) => {
+      state.error = null;
+      state.orderRequest = action.payload.success;
+      state.orderData = action.payload.order;
+    });
+    builder.addCase(orderBurger.rejected, (state, action) => {
+      state.error = action.error.message || 'Error during order burger';
+      state.orderRequest = false;
+    });
   }
 });
 
@@ -66,4 +95,5 @@ export const {
   moveIngredientDown
 } = burgerConstructorSlice.actions;
 
-export const { getConstructorItems } = burgerConstructorSlice.selectors;
+export const { getConstructorItems, getOrderRequest, getNewOrder } =
+  burgerConstructorSlice.selectors;
