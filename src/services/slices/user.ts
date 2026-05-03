@@ -1,4 +1,10 @@
-import { getUserApi, registerUserApi, TRegisterData } from '@api';
+import {
+  getUserApi,
+  loginUserApi,
+  registerUserApi,
+  TLoginData,
+  TRegisterData
+} from '@api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TUser } from '@utils-types';
 
@@ -16,6 +22,11 @@ export const fetchUser = createAsyncThunk(
 export const registerUser = createAsyncThunk(
   'user/registerUser',
   async (data: TRegisterData) => await registerUserApi(data)
+);
+
+export const loginUser = createAsyncThunk(
+  'user/loginUser',
+  async (data: TLoginData) => await loginUserApi(data)
 );
 
 const initialState: TUserState = {
@@ -59,6 +70,19 @@ export const userSlice = createSlice({
     builder.addCase(registerUser.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.error.message || 'Failed to register user';
+    });
+    builder.addCase(loginUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(loginUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = payload.user;
+    });
+    builder.addCase(loginUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to login user';
     });
   }
 });
