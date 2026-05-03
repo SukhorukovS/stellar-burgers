@@ -56,6 +56,11 @@ export const ingredientsReducer = ingredientsSlice.reducer;
 export const { getIngredients, getLoading, getError } =
   ingredientsSlice.selectors;
 
+export const getIngredientById = (id: string | undefined) =>
+  createSelector([getIngredients], (ingredients) =>
+    id ? ingredients.find((ingredient) => ingredient._id === id) : undefined
+  );
+
 export const getBuns = createSelector([getIngredients], (ingredients) =>
   ingredients.filter((ingredient) => ingredient.type === 'bun')
 );

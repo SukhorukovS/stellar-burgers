@@ -30,7 +30,7 @@ const App = () => {
   const location = useLocation();
   const didInit = useRef(false);
 
-  const backgroundLocation = location.state?.backgroundLocation;
+  const backgroundLocation = location.state?.background;
 
   useEffect(() => {
     if (!didInit.current) {
@@ -42,7 +42,7 @@ const App = () => {
 
   return (
     <Layout>
-      <Routes location={location}>
+      <Routes location={backgroundLocation || location}>
         {/* Публичные роуты */}
         <Route path={ROUTES.MAIN} element={<ConstructorPage />} />
         <Route path={ROUTES.FEED} element={<Feed />} />
