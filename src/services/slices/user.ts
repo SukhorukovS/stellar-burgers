@@ -28,7 +28,9 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   selectors: {
-    getUser: (state) => state.user
+    getUser: (state) => state.user,
+    getError: (state) => state.error,
+    getIsLoading: (state) => state.isLoading
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -63,4 +65,4 @@ export const userSlice = createSlice({
 
 export const userReducer = userSlice.reducer;
 
-export const { getUser } = userSlice.selectors;
+export const { getUser, getError, getIsLoading } = userSlice.selectors;
