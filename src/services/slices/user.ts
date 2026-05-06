@@ -12,6 +12,7 @@ import { TOrder, TUser } from '@utils-types';
 
 type TUserState = {
   user: TUser | null;
+  isInitialState: boolean;
   isLoading: boolean;
   error: string | null;
   orders: TOrder[] | null;
@@ -47,6 +48,7 @@ export const updateUser = createAsyncThunk(
 const initialState: TUserState = {
   user: null,
   isLoading: false,
+  isInitialState: true,
   error: null,
   orders: null,
   isOrdersLoading: false,
@@ -60,6 +62,7 @@ export const userSlice = createSlice({
     getUser: (state) => state.user,
     getError: (state) => state.error,
     getIsLoading: (state) => state.isLoading,
+    getIsInitialState: (state) => state.isInitialState,
     getOrders: (state) => state.orders,
     getIsOrdersLoading: (state) => state.isOrdersLoading,
     getOrdersError: (state) => state.ordersError
@@ -67,15 +70,18 @@ export const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchUser.pending, (state) => {
+      state.isInitialState = false;
       state.isLoading = true;
       state.error = null;
     });
     builder.addCase(fetchUser.fulfilled, (state, { payload }) => {
+      state.isInitialState = false;
       state.isLoading = false;
       state.error = null;
       state.user = payload.user;
     });
     builder.addCase(fetchUser.rejected, (state, action) => {
+      state.isInitialState = false;
       state.isLoading = false;
       state.error = action.error.message || 'Failed to fetch user';
     });
@@ -142,5 +148,6 @@ export const {
   getIsLoading,
   getOrders,
   getIsOrdersLoading,
-  getOrdersError
+  getOrdersError,
+  getIsInitialState
 } = userSlice.selectors;
