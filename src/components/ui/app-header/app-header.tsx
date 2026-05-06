@@ -48,7 +48,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
         <Logo className='' />
       </div>
       <NavLink
-        to={ROUTES.LOGIN}
+        to={userName ? ROUTES.PROFILE : ROUTES.LOGIN}
         className={({ isActive }) =>
           clsx(styles.link, { [styles.link_active]: isActive })
         }
