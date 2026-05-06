@@ -1,4 +1,5 @@
 import {
+  getOrdersApi,
   getUserApi,
   loginUserApi,
   registerUserApi,
@@ -6,12 +7,15 @@ import {
   TRegisterData
 } from '@api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { TUser } from '@utils-types';
+import { TOrder, TUser } from '@utils-types';
 
 type TUserState = {
   user: TUser | null;
   isLoading: boolean;
   error: string | null;
+  orders: TOrder[] | null;
+  isOrdersLoading: boolean;
+  ordersError: string | null;
 };
 
 export const fetchUser = createAsyncThunk(
@@ -29,10 +33,18 @@ export const loginUser = createAsyncThunk(
   async (data: TLoginData) => await loginUserApi(data)
 );
 
+export const fetchUserOrders = createAsyncThunk(
+  'user/fetchUserOrders',
+  async () => await getOrdersApi()
+);
+
 const initialState: TUserState = {
+  user: null,
   isLoading: false,
   error: null,
-  user: null
+  orders: null,
+  isOrdersLoading: false,
+  ordersError: null
 };
 
 export const userSlice = createSlice({
@@ -41,7 +53,10 @@ export const userSlice = createSlice({
   selectors: {
     getUser: (state) => state.user,
     getError: (state) => state.error,
-    getIsLoading: (state) => state.isLoading
+    getIsLoading: (state) => state.isLoading,
+    getOrders: (state) => state.orders,
+    getIsOrdersLoading: (state) => state.isOrdersLoading,
+    getOrdersError: (state) => state.ordersError
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -84,9 +99,29 @@ export const userSlice = createSlice({
       state.isLoading = false;
       state.error = action.error.message || 'Failed to login user';
     });
+    builder.addCase(fetchUserOrders.pending, (state) => {
+      state.isOrdersLoading = true;
+      state.ordersError = null;
+    });
+    builder.addCase(fetchUserOrders.fulfilled, (state, { payload }) => {
+      state.isOrdersLoading = false;
+      state.ordersError = null;
+      state.orders = payload;
+    });
+    builder.addCase(fetchUserOrders.rejected, (state, action) => {
+      state.isOrdersLoading = false;
+      state.ordersError = action.error.message || 'Failed to login user';
+    });
   }
 });
 
 export const userReducer = userSlice.reducer;
 
-export const { getUser, getError, getIsLoading } = userSlice.selectors;
+export const {
+  getUser,
+  getError,
+  getIsLoading,
+  getOrders,
+  getIsOrdersLoading,
+  getOrdersError
+} = userSlice.selectors;
