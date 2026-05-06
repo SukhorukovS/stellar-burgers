@@ -4,7 +4,8 @@ import {
   loginUserApi,
   registerUserApi,
   TLoginData,
-  TRegisterData
+  TRegisterData,
+  updateUserApi
 } from '@api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TOrder, TUser } from '@utils-types';
@@ -36,6 +37,11 @@ export const loginUser = createAsyncThunk(
 export const fetchUserOrders = createAsyncThunk(
   'user/fetchUserOrders',
   async () => await getOrdersApi()
+);
+
+export const updateUser = createAsyncThunk(
+  'user/updateUser',
+  async (data: TUser) => await updateUserApi(data)
 );
 
 const initialState: TUserState = {
@@ -110,7 +116,20 @@ export const userSlice = createSlice({
     });
     builder.addCase(fetchUserOrders.rejected, (state, action) => {
       state.isOrdersLoading = false;
-      state.ordersError = action.error.message || 'Failed to login user';
+      state.ordersError = action.error.message || 'Failed to fetch user orders';
+    });
+    builder.addCase(updateUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = payload.user;
+    });
+    builder.addCase(updateUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to update user';
     });
   }
 });
