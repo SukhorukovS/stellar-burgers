@@ -3,6 +3,7 @@ import { getIsInitialState, getIsLoading, getUser } from '@slices/user';
 import { Preloader } from '@ui';
 import { Navigate } from 'react-router-dom';
 import { getCookie } from '../../utils/cookie';
+import { ROUTES } from './types';
 
 export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const isLoading = useSelector(getIsLoading);
@@ -16,7 +17,7 @@ export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   }
 
   if (!token || !isAuthenticated) {
-    return <Navigate to='/login' replace />;
+    return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
   return children;

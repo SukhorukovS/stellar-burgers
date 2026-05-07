@@ -7,6 +7,7 @@ import {
 import styles from '../common.module.css';
 import { Link } from 'react-router-dom';
 import { LoginUIProps } from './type';
+import { ROUTES } from '../../../routes/types';
 
 export const LoginUI: FC<LoginUIProps> = ({
   email,
@@ -58,13 +59,13 @@ export const LoginUI: FC<LoginUIProps> = ({
       </form>
       <div className={`pb-4 ${styles.question} text text_type_main-default`}>
         Вы - новый пользователь?
-        <Link to='/register' className={`pl-2 ${styles.link}`}>
+        <Link to={ROUTES.REGISTER} className={`pl-2 ${styles.link}`}>
           Зарегистрироваться
         </Link>
       </div>
       <div className={`${styles.question} text text_type_main-default pb-6`}>
         Забыли пароль?
-        <Link to={'/forgot-password'} className={`pl-2 ${styles.link}`}>
+        <Link to={ROUTES.FORGOT_PASSWORD} className={`pl-2 ${styles.link}`}>
           Восстановить пароль
         </Link>
       </div>

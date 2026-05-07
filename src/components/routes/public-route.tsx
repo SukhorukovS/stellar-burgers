@@ -2,6 +2,7 @@ import { useSelector } from '@services/store';
 import { getIsInitialState, getIsLoading, getUser } from '@slices/user';
 import { Preloader } from '@ui';
 import { Navigate } from 'react-router-dom';
+import { ROUTES } from './types';
 
 export const PublicRoute = ({ children }: { children: JSX.Element }) => {
   const isLoading = useSelector(getIsLoading);
@@ -13,7 +14,7 @@ export const PublicRoute = ({ children }: { children: JSX.Element }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to='/' replace />;
+    return <Navigate to={ROUTES.MAIN} replace />;
   }
 
   return children;

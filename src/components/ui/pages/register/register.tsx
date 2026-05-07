@@ -7,6 +7,7 @@ import {
 import styles from '../common.module.css';
 import { Link } from 'react-router-dom';
 import { RegisterUIProps } from './type';
+import { ROUTES } from '../../../routes/types';
 
 export const RegisterUI: FC<RegisterUIProps> = ({
   errorText,
@@ -72,7 +73,7 @@ export const RegisterUI: FC<RegisterUIProps> = ({
       </form>
       <div className={`${styles.question} text text_type_main-default pb-6`}>
         Уже зарегистрированы?
-        <Link to='/login' className={`pl-2 ${styles.link}`}>
+        <Link to={ROUTES.LOGIN} className={`pl-2 ${styles.link}`}>
           Войти
         </Link>
       </div>

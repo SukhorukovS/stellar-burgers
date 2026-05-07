@@ -47,12 +47,12 @@ const App = () => {
         {/* Публичные роуты */}
         <Route path={ROUTES.MAIN} element={<ConstructorPage />} />
         <Route path={ROUTES.FEED} element={<Feed />} />
-        <Route path='/feed/:number' element={<OrderInfo />} />
-        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+        <Route path={ROUTES.FEED_DETAIL} element={<OrderInfo />} />
+        <Route path={ROUTES.INGREDIENT} element={<IngredientDetails />} />
 
         {/* Защищённые роуты (только для неавторизованных) */}
         <Route
-          path='/login'
+          path={ROUTES.LOGIN}
           element={
             <PublicRoute>
               <Login />
@@ -60,7 +60,7 @@ const App = () => {
           }
         />
         <Route
-          path='/register'
+          path={ROUTES.REGISTER}
           element={
             <PublicRoute>
               <Register />
@@ -68,7 +68,7 @@ const App = () => {
           }
         />
         <Route
-          path='/forgot-password'
+          path={ROUTES.FORGOT_PASSWORD}
           element={
             <PublicRoute>
               <ForgotPassword />
@@ -76,7 +76,7 @@ const App = () => {
           }
         />
         <Route
-          path='/reset-password'
+          path={ROUTES.RESET_PASSWORD}
           element={
             <PublicRoute>
               <ResetPassword />
@@ -86,7 +86,7 @@ const App = () => {
 
         {/* Защищённые роуты (только для авторизованных) */}
         <Route
-          path='/profile'
+          path={ROUTES.PROFILE}
           element={
             <ProtectedRoute>
               <Profile />
@@ -94,7 +94,7 @@ const App = () => {
           }
         />
         <Route
-          path='/profile/orders'
+          path={ROUTES.PROFILE_ORDERS}
           element={
             <ProtectedRoute>
               <ProfileOrders />
@@ -102,10 +102,10 @@ const App = () => {
           }
         />
         <Route
-          path='/profile/orders/:number'
+          path={ROUTES.PROFILE_ORDER_DETAIL}
           element={
             <ProtectedRoute>
-              <OrderInfoModal />
+              <OrderInfo />
             </ProtectedRoute>
           }
         />
@@ -117,8 +117,19 @@ const App = () => {
       {/* Модальные окна */}
       {backgroundLocation && (
         <Routes>
-          <Route path='/feed/:number' element={<OrderInfoModal />} />
-          <Route path='/ingredients/:id' element={<IngredientDetailsModal />} />
+          <Route path={ROUTES.FEED_DETAIL} element={<OrderInfoModal />} />
+          <Route
+            path={ROUTES.INGREDIENT}
+            element={<IngredientDetailsModal />}
+          />
+          <Route
+            path={ROUTES.PROFILE_ORDER_DETAIL}
+            element={
+              <ProtectedRoute>
+                <OrderInfoModal />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       )}
     </Layout>
