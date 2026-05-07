@@ -2,6 +2,7 @@ import {
   getOrdersApi,
   getUserApi,
   loginUserApi,
+  logoutApi,
   registerUserApi,
   TLoginData,
   TRegisterData,
@@ -43,6 +44,11 @@ export const fetchUserOrders = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   'user/updateUser',
   async (data: TUser) => await updateUserApi(data)
+);
+
+export const logoutUser = createAsyncThunk(
+  'user/logoutUser',
+  async () => await logoutApi()
 );
 
 const initialState: TUserState = {
@@ -136,6 +142,20 @@ export const userSlice = createSlice({
     builder.addCase(updateUser.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.error.message || 'Failed to update user';
+    });
+    builder.addCase(logoutUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(logoutUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = null;
+    });
+    builder.addCase(logoutUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to update user';
+      state.user = null; // В любом случае разлогиниваем вне зависимости ошибки на бэке
     });
   }
 });
