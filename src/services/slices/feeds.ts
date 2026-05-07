@@ -1,4 +1,4 @@
-import { getFeedsApi } from '@api';
+import { getFeedsApi, getOrderByNumberApi } from '@api';
 import {
   createAsyncThunk,
   createSelector,
@@ -10,6 +10,9 @@ type TFeedState = {
   data: TOrdersData | null;
   isLoading: boolean;
   error: string | null;
+  currentOrder: TOrder | null;
+  isLoadingCurrentOrder: boolean;
+  currentOrderError: string | null;
 };
 
 export const fetchFeeds = createAsyncThunk(
@@ -17,10 +20,18 @@ export const fetchFeeds = createAsyncThunk(
   async () => await getFeedsApi()
 );
 
+export const fetchOrderByNumber = createAsyncThunk(
+  'feeds/getOrderByNumber',
+  async (number: number) => await getOrderByNumberApi(number)
+);
+
 const initialState: TFeedState = {
   data: null,
   isLoading: false,
-  error: null
+  error: null,
+  currentOrder: null,
+  isLoadingCurrentOrder: false,
+  currentOrderError: null
 };
 
 export const feedSlice = createSlice({
@@ -29,7 +40,8 @@ export const feedSlice = createSlice({
   reducers: {},
   selectors: {
     getOrders: (state) => state.data?.orders,
-    getFeed: (state) => state.data
+    getFeed: (state) => state.data,
+    getCurrentOrder: (state) => state.currentOrder
   },
   extraReducers: (builder) => {
     builder.addCase(fetchFeeds.pending, (state) => {
@@ -45,16 +57,22 @@ export const feedSlice = createSlice({
       state.isLoading = false;
       state.error = action.error.message || 'Failed to fetch feeds';
     });
+    builder.addCase(fetchOrderByNumber.pending, (state) => {
+      state.isLoadingCurrentOrder = true;
+      state.currentOrderError = null;
+      state.currentOrder = null;
+    });
+    builder.addCase(fetchOrderByNumber.fulfilled, (state, action) => {
+      state.isLoadingCurrentOrder = false;
+      state.currentOrder = action.payload.orders[0];
+    });
+    builder.addCase(fetchOrderByNumber.rejected, (state, action) => {
+      state.isLoadingCurrentOrder = false;
+      state.currentOrderError = action.error.message || 'Failed to fetch feeds';
+    });
   }
 });
 
 export const feedReducer = feedSlice.reducer;
 
-export const { getOrders, getFeed } = feedSlice.selectors;
-
-export const getOrderByNumber = (number: string | undefined) =>
-  createSelector([getOrders], (orders) =>
-    number
-      ? orders?.find((order) => order.number === Number(number))
-      : undefined
-  );
+export const { getOrders, getFeed, getCurrentOrder } = feedSlice.selectors;
