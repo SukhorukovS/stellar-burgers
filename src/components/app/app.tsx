@@ -36,7 +36,6 @@ const App = () => {
   useEffect(() => {
     if (!didInit.current) {
       dispatch(fetchIngredients());
-      dispatch(fetchFeeds());
       dispatch(fetchUser());
       didInit.current = true;
     }
