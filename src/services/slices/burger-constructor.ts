@@ -1,12 +1,14 @@
 import { orderBurgerApi } from '@api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TConstructorIngredient, TOrder } from '@utils-types';
+import { v4 as uuidv4 } from 'uuid';
 
 type TBun = {
   price: number;
   name: string;
   image: string;
   id: string;
+  _id: string;
 } | null;
 
 type TConstructorBurger = {
@@ -35,11 +37,17 @@ export const burgerConstructorSlice = createSlice({
   name: 'burgerConstructor',
   initialState,
   reducers: {
-    addBun: (state, action: { payload: TBun }) => {
-      state.constructorItems.bun = action.payload;
+    addBun: {
+      reducer: (state, action: { payload: TBun }) => {
+        state.constructorItems.bun = action.payload;
+      },
+      prepare: (bun) => ({ payload: { id: uuidv4(), ...bun } })
     },
-    addIngredient: (state, action: { payload: TConstructorIngredient }) => {
-      state.constructorItems.ingredients.push(action.payload);
+    addIngredient: {
+      reducer: (state, action: { payload: TConstructorIngredient }) => {
+        state.constructorItems.ingredients.push(action.payload);
+      },
+      prepare: (ingredient) => ({ payload: { id: uuidv4(), ...ingredient } })
     },
     removeIngredientByIndex: (state, action) => {
       state.constructorItems.ingredients.splice(action.payload, 1);
@@ -78,6 +86,7 @@ export const burgerConstructorSlice = createSlice({
       state.error = null;
       state.orderRequest = false;
       state.orderData = action.payload.order;
+      state.constructorItems = { bun: null, ingredients: [] };
     });
     builder.addCase(orderBurger.rejected, (state, action) => {
       state.error = action.error.message || 'Error during order burger';

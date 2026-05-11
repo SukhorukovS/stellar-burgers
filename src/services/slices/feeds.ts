@@ -1,9 +1,5 @@
 import { getFeedsApi, getOrderByNumberApi } from '@api';
-import {
-  createAsyncThunk,
-  createSelector,
-  createSlice
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TOrder, TOrdersData } from '../../utils/types';
 
 type TFeedState = {
@@ -15,10 +11,7 @@ type TFeedState = {
   currentOrderError: string | null;
 };
 
-export const fetchFeeds = createAsyncThunk(
-  'feeds/fetchFeeds',
-  async () => await getFeedsApi()
-);
+export const fetchFeeds = createAsyncThunk('feeds/fetchFeeds', getFeedsApi);
 
 export const fetchOrderByNumber = createAsyncThunk(
   'feeds/getOrderByNumber',

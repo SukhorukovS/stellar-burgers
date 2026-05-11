@@ -24,12 +24,15 @@ export const BurgerConstructor: FC = () => {
   const orderModalData = useSelector(getNewOrder);
 
   const onOrderClick = () => {
-    if (!user) navigate(ROUTES.LOGIN);
+    if (!user) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
     if (!constructorItems.bun || orderRequest) return;
     const ingredients = constructorItems.ingredients.map(
       (ingredient) => ingredient._id
     );
-    dispatch(orderBurger([constructorItems.bun.id, ...ingredients]));
+    dispatch(orderBurger([constructorItems.bun._id, ...ingredients]));
   };
   const closeOrderModal = () => {
     dispatch(clearState());

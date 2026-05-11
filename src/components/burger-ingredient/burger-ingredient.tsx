@@ -14,11 +14,11 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
 
     const handleAdd = () => {
       if (ingredient.type === 'bun') {
-        dispatch(addBun({ id: ingredient._id, ...ingredient }));
+        dispatch(addBun(ingredient));
         return;
       }
 
-      dispatch(addIngredient({ id: ingredient._id, ...ingredient }));
+      dispatch(addIngredient(ingredient));
     };
 
     return (

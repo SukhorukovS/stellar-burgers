@@ -12,7 +12,7 @@ export const ProfileMenu: FC = () => {
 
   const handleLogout = async () => {
     dispatch(logoutUser());
-    navigate(ROUTES.MAIN);
+    navigate(ROUTES.LOGIN);
   };
 
   return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;

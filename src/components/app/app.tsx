@@ -23,8 +23,9 @@ import { useEffect, useRef } from 'react';
 import { fetchIngredients } from '../../services/slices/ingredients';
 import { useDispatch } from '../../services/store';
 import { ROUTES } from '../routes/types';
-import { fetchFeeds } from '@slices/feeds';
 import { fetchUser } from '@slices/user';
+
+import styles from './app.module.css';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -47,8 +48,28 @@ const App = () => {
         {/* Публичные роуты */}
         <Route path={ROUTES.MAIN} element={<ConstructorPage />} />
         <Route path={ROUTES.FEED} element={<Feed />} />
-        <Route path={ROUTES.FEED_DETAIL} element={<OrderInfo />} />
-        <Route path={ROUTES.INGREDIENT} element={<IngredientDetails />} />
+        <Route
+          path={ROUTES.FEED_DETAIL}
+          element={
+            <div className={styles.detailPageWrap}>
+              <p className={`text text_type_main-large ${styles.detailHeader}`}>
+                Детали заказа
+              </p>
+              <OrderInfo />
+            </div>
+          }
+        />
+        <Route
+          path={ROUTES.INGREDIENT}
+          element={
+            <div className={styles.detailPageWrap}>
+              <p className={`text text_type_main-large ${styles.detailHeader}`}>
+                Детали ингредиента
+              </p>
+              <IngredientDetails />
+            </div>
+          }
+        />
 
         {/* Защищённые роуты (только для неавторизованных) */}
         <Route
@@ -105,7 +126,14 @@ const App = () => {
           path={ROUTES.PROFILE_ORDER_DETAIL}
           element={
             <ProtectedRoute>
-              <OrderInfo />
+              <div className={styles.detailPageWrap}>
+                <p
+                  className={`text text_type_main-large ${styles.detailHeader}`}
+                >
+                  Детали заказа
+                </p>
+                <OrderInfo />
+              </div>
             </ProtectedRoute>
           }
         />
