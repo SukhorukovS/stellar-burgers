@@ -43,7 +43,7 @@ export const fetchUserOrders = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'user/updateUser',
-  async (data: TUser) => await updateUserApi(data)
+  async (data: Partial<TRegisterData>) => await updateUserApi(data)
 );
 
 export const logoutUser = createAsyncThunk(

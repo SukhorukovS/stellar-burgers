@@ -1,3 +1,4 @@
+import { TRegisterData } from '@api';
 import { useDispatch, useSelector } from '@services/store';
 import { getUser, updateUser } from '@slices/user';
 import { ProfileUI } from '@ui-pages';
@@ -30,12 +31,16 @@ export const Profile: FC = () => {
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     if (isFormChanged) {
-      dispatch(
-        updateUser({
-          name: formValue.name,
-          email: formValue.email
-        })
-      );
+      const newUser: Partial<TRegisterData> = {
+        name: formValue.name,
+        email: formValue.email
+      };
+
+      if (formValue.password) {
+        newUser.password = formValue.password;
+      }
+
+      dispatch(updateUser(newUser));
     }
   };
 
