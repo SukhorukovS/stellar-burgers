@@ -1,0 +1,173 @@
+import {
+  getOrdersApi,
+  getUserApi,
+  loginUserApi,
+  logoutApi,
+  registerUserApi,
+  TLoginData,
+  TRegisterData,
+  updateUserApi
+} from '@api';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { TOrder, TUser } from '@utils-types';
+
+type TUserState = {
+  user: TUser | null;
+  isInitialState: boolean;
+  isLoading: boolean;
+  error: string | null;
+  orders: TOrder[] | null;
+  isOrdersLoading: boolean;
+  ordersError: string | null;
+};
+
+export const fetchUser = createAsyncThunk(
+  'user/fetchUser',
+  async () => await getUserApi()
+);
+
+export const registerUser = createAsyncThunk(
+  'user/registerUser',
+  async (data: TRegisterData) => await registerUserApi(data)
+);
+
+export const loginUser = createAsyncThunk(
+  'user/loginUser',
+  async (data: TLoginData) => await loginUserApi(data)
+);
+
+export const fetchUserOrders = createAsyncThunk(
+  'user/fetchUserOrders',
+  async () => await getOrdersApi()
+);
+
+export const updateUser = createAsyncThunk(
+  'user/updateUser',
+  async (data: Partial<TRegisterData>) => await updateUserApi(data)
+);
+
+export const logoutUser = createAsyncThunk(
+  'user/logoutUser',
+  async () => await logoutApi()
+);
+
+const initialState: TUserState = {
+  user: null,
+  isLoading: false,
+  isInitialState: true,
+  error: null,
+  orders: null,
+  isOrdersLoading: false,
+  ordersError: null
+};
+
+export const userSlice = createSlice({
+  name: 'user',
+  initialState,
+  selectors: {
+    getUser: (state) => state.user,
+    getError: (state) => state.error,
+    getIsLoading: (state) => state.isLoading,
+    getIsInitialState: (state) => state.isInitialState,
+    getOrders: (state) => state.orders,
+    getIsOrdersLoading: (state) => state.isOrdersLoading,
+    getOrdersError: (state) => state.ordersError
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(fetchUser.pending, (state) => {
+      state.isInitialState = false;
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(fetchUser.fulfilled, (state, { payload }) => {
+      state.isInitialState = false;
+      state.isLoading = false;
+      state.error = null;
+      state.user = payload.user;
+    });
+    builder.addCase(fetchUser.rejected, (state, action) => {
+      state.isInitialState = false;
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to fetch user';
+    });
+    builder.addCase(registerUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(registerUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = payload.user;
+    });
+    builder.addCase(registerUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to register user';
+    });
+    builder.addCase(loginUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(loginUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = payload.user;
+    });
+    builder.addCase(loginUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to login user';
+    });
+    builder.addCase(fetchUserOrders.pending, (state) => {
+      state.isOrdersLoading = true;
+      state.ordersError = null;
+    });
+    builder.addCase(fetchUserOrders.fulfilled, (state, { payload }) => {
+      state.isOrdersLoading = false;
+      state.ordersError = null;
+      state.orders = payload;
+    });
+    builder.addCase(fetchUserOrders.rejected, (state, action) => {
+      state.isOrdersLoading = false;
+      state.ordersError = action.error.message || 'Failed to fetch user orders';
+    });
+    builder.addCase(updateUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = payload.user;
+    });
+    builder.addCase(updateUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to update user';
+    });
+    builder.addCase(logoutUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(logoutUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false;
+      state.error = null;
+      state.user = null;
+    });
+    builder.addCase(logoutUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Failed to update user';
+      state.user = null; // В любом случае разлогиниваем вне зависимости ошибки на бэке
+    });
+  }
+});
+
+export const userReducer = userSlice.reducer;
+
+export const {
+  getUser,
+  getError,
+  getIsLoading,
+  getOrders,
+  getIsOrdersLoading,
+  getOrdersError,
+  getIsInitialState
+} = userSlice.selectors;
