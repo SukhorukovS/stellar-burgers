@@ -93,6 +93,7 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier ./src --write",
+    "test": "jest",
     "cypress": "cypress open",
     "test:e2e": "start-server-and-test start http://localhost:4000 cypress"
   },
