@@ -1,10 +1,15 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
 import {
   addIngredient,
   removeIngredientByIndex,
   moveIngredientUp,
   moveIngredientDown,
-  burgerConstructorReducer
+  orderBurger,
+  burgerConstructorReducer,
+  getConstructorItems,
+  getNewOrder,
+  getOrderRequest
 } from './burger-constructor';
 
 const initialState = {
@@ -12,36 +17,96 @@ const initialState = {
   error: null as string | null,
   orderData: null as TOrder | null,
   constructorItems: {
-    bun: { price: 0, name: '', image: '', id: '', _id: '' } as null | {
+    bun: null as {
       price: number;
       name: string;
       image: string;
       id: string;
       _id: string;
-    },
+    } | null,
     ingredients: [] as any[]
   }
 };
 
-describe('burgerConstructor reducer', () => {
-  const mockIngredient = {
-    _id: 'ingredient-1',
-    name: 'Котлета',
-    type: 'main' as const,
-    proteins: 100,
-    fat: 50,
-    carbohydrates: 30,
-    calories: 200,
-    price: 100,
-    image: 'image.jpg',
-    image_large: 'image_large.jpg',
-    image_mobile: 'image_mobile.jpg'
-  };
+const mockIngredient = {
+  _id: 'ingredient-1',
+  name: 'Котлета',
+  type: 'main' as const,
+  proteins: 100,
+  fat: 50,
+  carbohydrates: 30,
+  calories: 200,
+  price: 100,
+  image: 'image.jpg',
+  image_large: 'image_large.jpg',
+  image_mobile: 'image_mobile.jpg'
+};
 
+const mockOrder = {
+  _id: 'order-1',
+  ingredients: ['ingredient-1', 'ingredient-2'],
+  status: 'done' as const,
+  name: 'Space Burger',
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
+  number: 1
+};
+
+describe('async actions', () => {
+  test('should order burger', async () => {
+    const mockOrderResponse = {
+      success: true,
+      order: mockOrder,
+      name: 'Space Burger'
+    };
+
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(mockOrderResponse),
+        ok: true
+      })
+    ) as jest.Mock;
+
+    const store = configureStore({
+      reducer: { burgerConstructor: burgerConstructorReducer }
+    });
+
+    const ingredientsIds = ['ingredient-1', 'ingredient-2'];
+    await store.dispatch(orderBurger(ingredientsIds));
+
+    const { orderData, orderRequest } = store.getState().burgerConstructor;
+    expect(orderData).toEqual(mockOrder);
+    expect(orderRequest).toBe(false);
+  });
+
+  test('should handle error', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.reject(new Error('Order failed')),
+        ok: false
+      })
+    ) as jest.Mock;
+
+    const store = configureStore({
+      reducer: { burgerConstructor: burgerConstructorReducer }
+    });
+
+    const ingredientsIds = ['ingredient-1', 'ingredient-2'];
+    await store.dispatch(orderBurger(ingredientsIds));
+
+    const { error, orderRequest } = store.getState().burgerConstructor;
+    expect(orderRequest).toBe(false);
+    expect(error).not.toBeNull();
+  });
+});
+
+describe('burgerConstructor reducer', () => {
   describe('addIngredient', () => {
     it('should add ingredient to the constructor', () => {
-      const action = addIngredient(mockIngredient);
-      const state = burgerConstructorReducer(initialState, action);
+      const state = burgerConstructorReducer(
+        initialState,
+        addIngredient(mockIngredient)
+      );
 
       expect(state.constructorItems.ingredients).toHaveLength(1);
       expect(state.constructorItems.ingredients[0]).toMatchObject(
@@ -163,6 +228,51 @@ describe('burgerConstructor reducer', () => {
       expect(state.constructorItems.ingredients[1]).toEqual(originalOrder[2]);
       expect(state.constructorItems.ingredients[2]).toEqual(originalOrder[0]);
       expect(state.constructorItems.ingredients[3]).toEqual(originalOrder[3]);
+    });
+  });
+});
+
+describe('burgerConstructor selectors', () => {
+  describe('slice selectors', () => {
+    it('should return constructor items', () => {
+      const mockConstructorIngredient = { ...mockIngredient, id: 'test-id' };
+      const state = {
+        burgerConstructor: {
+          ...initialState,
+          constructorItems: {
+            bun: null,
+            ingredients: [mockConstructorIngredient]
+          }
+        }
+      };
+
+      const constructorItems = getConstructorItems(state);
+      expect(constructorItems.ingredients).toHaveLength(1);
+      expect(constructorItems.ingredients[0]).toMatchObject(mockIngredient);
+    });
+
+    it('should return new order', () => {
+      const state = {
+        burgerConstructor: {
+          ...initialState,
+          orderData: mockOrder
+        }
+      };
+
+      const orderData = getNewOrder(state);
+      expect(orderData).toEqual(mockOrder);
+    });
+
+    it('should return order request status', () => {
+      const state = {
+        burgerConstructor: {
+          ...initialState,
+          orderRequest: true
+        }
+      };
+
+      const orderRequest = getOrderRequest(state);
+      expect(orderRequest).toBe(true);
     });
   });
 });
