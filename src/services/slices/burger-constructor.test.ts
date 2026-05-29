@@ -52,51 +52,37 @@ const mockOrder = {
   number: 1
 };
 
-describe('async actions', () => {
-  test('should order burger', async () => {
-    const mockOrderResponse = {
-      success: true,
-      order: mockOrder,
-      name: 'Space Burger'
-    };
-
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(mockOrderResponse),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { burgerConstructor: burgerConstructorReducer }
+describe('async actions reducers', () => {
+  test('order burger pending', () => {
+    const state = burgerConstructorReducer(initialState, {
+      type: 'burger/orderBurger/pending'
     });
 
-    const ingredientsIds = ['ingredient-1', 'ingredient-2'];
-    await store.dispatch(orderBurger(ingredientsIds));
-
-    const { orderData, orderRequest } = store.getState().burgerConstructor;
-    expect(orderData).toEqual(mockOrder);
-    expect(orderRequest).toBe(false);
+    expect(state.orderRequest).toBe(true);
+    expect(state.error).toBeNull();
   });
 
-  test('should handle error', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.reject(new Error('Order failed')),
-        ok: false
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { burgerConstructor: burgerConstructorReducer }
+  test('order burger fulfilled', () => {
+    const state = burgerConstructorReducer(initialState, {
+      type: 'burger/orderBurger/fulfilled',
+      payload: { order: mockOrder, name: 'Space Burger' }
     });
 
-    const ingredientsIds = ['ingredient-1', 'ingredient-2'];
-    await store.dispatch(orderBurger(ingredientsIds));
+    expect(state.orderRequest).toBe(false);
+    expect(state.orderData).toEqual(mockOrder);
+    expect(state.error).toBeNull();
+    expect(state.constructorItems.bun).toBeNull();
+    expect(state.constructorItems.ingredients).toHaveLength(0);
+  });
 
-    const { error, orderRequest } = store.getState().burgerConstructor;
-    expect(orderRequest).toBe(false);
-    expect(error).not.toBeNull();
+  test('order burger rejected', () => {
+    const state = burgerConstructorReducer(initialState, {
+      type: 'burger/orderBurger/rejected',
+      error: { message: 'Order failed' }
+    });
+
+    expect(state.orderRequest).toBe(false);
+    expect(state.error).toContain('Order failed');
   });
 });
 

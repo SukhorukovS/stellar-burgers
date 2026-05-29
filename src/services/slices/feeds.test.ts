@@ -53,81 +53,67 @@ const mockCurrentOrder = {
   number: 1
 };
 
-describe('async actions', () => {
-  test('loading feeds', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({ success: true, ...mockOrderData }),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { feeds: feedReducer }
+describe('async actions reducers', () => {
+  test('fetch feeds pending', () => {
+    const state = feedReducer(initialState, {
+      type: 'feeds/fetchFeeds/pending'
     });
 
-    await store.dispatch(fetchFeeds());
-
-    const { data, isLoading } = store.getState().feeds;
-    expect(data).toEqual({ success: true, ...mockOrderData });
-    expect(isLoading).toBe(false);
+    expect(state.isLoading).toBe(true);
+    expect(state.error).toBeNull();
+    expect(state.data).toBeNull();
   });
 
-  test('getting order by number', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({ orders: [mockCurrentOrder] }),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { feeds: feedReducer }
+  test('fetch feeds fulfilled', () => {
+    const state = feedReducer(initialState, {
+      type: 'feeds/fetchFeeds/fulfilled',
+      payload: mockOrderData
     });
 
-    await store.dispatch(fetchOrderByNumber(1));
-
-    const { currentOrder, isLoadingCurrentOrder } = store.getState().feeds;
-    expect(currentOrder).toEqual(mockCurrentOrder);
-    expect(isLoadingCurrentOrder).toBe(false);
+    expect(state.isLoading).toBe(false);
+    expect(state.data).toEqual(mockOrderData);
+    expect(state.error).toBeNull();
   });
 
-  test('handling errors', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.reject(new Error('Network error')),
-        ok: false
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { feeds: feedReducer }
+  test('fetch feeds rejected', () => {
+    const state = feedReducer(initialState, {
+      type: 'feeds/fetchFeeds/rejected',
+      error: { message: 'Network error' }
     });
 
-    await store.dispatch(fetchFeeds());
-
-    const { error, isLoading } = store.getState().feeds;
-    expect(isLoading).toBe(false);
-    expect(error).not.toBeNull();
+    expect(state.isLoading).toBe(false);
+    expect(state.error).toContain('Network error');
   });
 
-  test('handling error in getting order by number', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.reject(new Error('Order not found')),
-        ok: false
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { feeds: feedReducer }
+  test('fetch order by number pending', () => {
+    const state = feedReducer(initialState, {
+      type: 'feeds/getOrderByNumber/pending'
     });
 
-    await store.dispatch(fetchOrderByNumber(999));
+    expect(state.isLoadingCurrentOrder).toBe(true);
+    expect(state.currentOrderError).toBeNull();
+    expect(state.currentOrder).toBeNull();
+  });
 
-    const { currentOrderError, isLoadingCurrentOrder } = store.getState().feeds;
-    expect(isLoadingCurrentOrder).toBe(false);
-    expect(currentOrderError).not.toBeNull();
+  test('fetch order by number fulfilled', () => {
+    const state = feedReducer(initialState, {
+      type: 'feeds/getOrderByNumber/fulfilled',
+      payload: { orders: [mockCurrentOrder] }
+    });
+
+    expect(state.isLoadingCurrentOrder).toBe(false);
+    expect(state.currentOrder).toEqual(mockCurrentOrder);
+    expect(state.currentOrderError).toBeNull();
+  });
+
+  test('fetch order by number rejected', () => {
+    const state = feedReducer(initialState, {
+      type: 'feeds/getOrderByNumber/rejected',
+      error: { message: 'Order not found' }
+    });
+
+    expect(state.isLoadingCurrentOrder).toBe(false);
+    expect(state.currentOrderError).toContain('Order not found');
   });
 });
 

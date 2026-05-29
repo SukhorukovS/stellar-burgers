@@ -73,42 +73,36 @@ const mockIngredients = [
   }
 ];
 
-describe('async actions', () => {
-  test('loading ingredients', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({ success: true, data: mockIngredients }),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { ingredients: ingredientsReducer }
+describe('async actions reducers', () => {
+  test('fetch ingredients pending', () => {
+    const state = ingredientsReducer(initialState, {
+      type: 'ingredients/fetchIngredients/pending'
     });
 
-    await store.dispatch(fetchIngredients());
-
-    const { ingredients } = store.getState().ingredients;
-    expect(ingredients).toEqual(mockIngredients);
+    expect(state.isLoading).toBe(true);
+    expect(state.error).toBeNull();
   });
 
-  test('handling errors', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.reject(new Error('Network error')),
-        ok: false
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { ingredients: ingredientsReducer }
+  test('fetch ingredients fulfilled', () => {
+    const state = ingredientsReducer(initialState, {
+      type: 'ingredients/fetchIngredients/fulfilled',
+      payload: mockIngredients
     });
 
-    await store.dispatch(fetchIngredients());
+    expect(state.isLoading).toBe(false);
+    expect(state.ingredients).toEqual(mockIngredients);
+    expect(state.error).toBeNull();
+  });
 
-    const { error, isLoading } = store.getState().ingredients;
-    expect(isLoading).toBe(false);
-    expect(error).not.toBeNull();
+  test('fetch ingredients rejected', () => {
+    const state = ingredientsReducer(initialState, {
+      type: 'ingredients/fetchIngredients/rejected',
+      error: { message: 'Network error' }
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.ingredients).toEqual([]);
+    expect(state.error).toContain('Network error');
   });
 });
 

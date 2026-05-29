@@ -58,148 +58,193 @@ const mockOrders = [
   }
 ];
 
-describe('async actions', () => {
-  test('get user', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(mockUserResponse),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer }
+describe('async actions reducers', () => {
+  test('fetch user pending', () => {
+    const state = userReducer(initialState, {
+      type: 'user/fetchUser/pending'
     });
 
-    await store.dispatch(fetchUser());
-
-    const { user, isInitialState } = store.getState().user;
-    expect(user).toEqual(mockUser);
-    expect(isInitialState).toBe(false);
+    expect(state.isLoading).toBe(true);
+    expect(state.isInitialState).toBe(false);
+    expect(state.error).toBeNull();
   });
 
-  test('register user', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(mockUserResponse),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer }
+  test('fetch user fulfilled', () => {
+    const state = userReducer(initialState, {
+      type: 'user/fetchUser/fulfilled',
+      payload: mockUserResponse
     });
 
-    await store.dispatch(
-      registerUser({ email: 'test@example.com', name: 'Test', password: '123' })
-    );
-
-    const { user } = store.getState().user;
-    expect(user).toEqual(mockUser);
+    expect(state.isLoading).toBe(false);
+    expect(state.isInitialState).toBe(false);
+    expect(state.user).toEqual(mockUser);
+    expect(state.error).toBeNull();
   });
 
-  test('enter user', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(mockUserResponse),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer }
+  test('fetch user rejected', () => {
+    const state = userReducer(initialState, {
+      type: 'user/fetchUser/rejected',
+      error: { message: 'Network error' }
     });
 
-    await store.dispatch(
-      loginUser({ email: 'test@example.com', password: '123' })
-    );
-
-    const { user } = store.getState().user;
-    expect(user).toEqual(mockUser);
+    expect(state.isLoading).toBe(false);
+    expect(state.isInitialState).toBe(false);
+    expect(state.error).toContain('Network error');
   });
 
-  test('get user orders', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({ success: true, orders: mockOrders }),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer }
+  test('register user pending', () => {
+    const state = userReducer(initialState, {
+      type: 'user/registerUser/pending'
     });
 
-    await store.dispatch(fetchUserOrders());
-
-    const { orders, isOrdersLoading } = store.getState().user;
-    expect(orders).toEqual(mockOrders);
-    expect(isOrdersLoading).toBe(false);
+    expect(state.isLoading).toBe(true);
+    expect(state.error).toBeNull();
   });
 
-  test('update user', async () => {
+  test('register user fulfilled', () => {
+    const state = userReducer(initialState, {
+      type: 'user/registerUser/fulfilled',
+      payload: mockUserResponse
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.user).toEqual(mockUser);
+    expect(state.error).toBeNull();
+  });
+
+  test('register user rejected', () => {
+    const state = userReducer(initialState, {
+      type: 'user/registerUser/rejected',
+      error: { message: 'Registration failed' }
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.error).toContain('Registration failed');
+  });
+
+  test('login user pending', () => {
+    const state = userReducer(initialState, {
+      type: 'user/loginUser/pending'
+    });
+
+    expect(state.isLoading).toBe(true);
+    expect(state.error).toBeNull();
+  });
+
+  test('login user fulfilled', () => {
+    const state = userReducer(initialState, {
+      type: 'user/loginUser/fulfilled',
+      payload: mockUserResponse
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.user).toEqual(mockUser);
+    expect(state.error).toBeNull();
+  });
+
+  test('login user rejected', () => {
+    const state = userReducer(initialState, {
+      type: 'user/loginUser/rejected',
+      error: { message: 'Login failed' }
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.error).toContain('Login failed');
+  });
+
+  test('fetch user orders pending', () => {
+    const state = userReducer(initialState, {
+      type: 'user/fetchUserOrders/pending'
+    });
+
+    expect(state.isOrdersLoading).toBe(true);
+    expect(state.ordersError).toBeNull();
+  });
+
+  test('fetch user orders fulfilled', () => {
+    const state = userReducer(initialState, {
+      type: 'user/fetchUserOrders/fulfilled',
+      payload: mockOrders
+    });
+
+    expect(state.isOrdersLoading).toBe(false);
+    expect(state.orders).toEqual(mockOrders);
+    expect(state.ordersError).toBeNull();
+  });
+
+  test('fetch user orders rejected', () => {
+    const state = userReducer(initialState, {
+      type: 'user/fetchUserOrders/rejected',
+      error: { message: 'Failed to fetch orders' }
+    });
+
+    expect(state.isOrdersLoading).toBe(false);
+    expect(state.ordersError).toContain('Failed to fetch orders');
+  });
+
+  test('update user pending', () => {
+    const state = userReducer(initialState, {
+      type: 'user/updateUser/pending'
+    });
+
+    expect(state.isLoading).toBe(true);
+    expect(state.error).toBeNull();
+  });
+
+  test('update user fulfilled', () => {
     const updatedUser = { email: 'new@example.com', name: 'New User' };
-    const updatedResponse = { success: true, user: updatedUser };
-
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(updatedResponse),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer }
+    const state = userReducer(initialState, {
+      type: 'user/updateUser/fulfilled',
+      payload: { success: true, user: updatedUser }
     });
 
-    await store.dispatch(updateUser({ name: 'New User' }));
-
-    const { user } = store.getState().user;
-    expect(user).toEqual(updatedUser);
+    expect(state.isLoading).toBe(false);
+    expect(state.user).toEqual(updatedUser);
+    expect(state.error).toBeNull();
   });
 
-  test('logout user', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({ success: true }),
-        ok: true
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer },
-      preloadedState: {
-        user: {
-          ...initialState,
-          user: mockUser
-        }
-      }
+  test('update user rejected', () => {
+    const state = userReducer(initialState, {
+      type: 'user/updateUser/rejected',
+      error: { message: 'Update failed' }
     });
 
-    await store.dispatch(logoutUser());
-
-    const { user } = store.getState().user;
-    expect(user).toBeNull();
+    expect(state.isLoading).toBe(false);
+    expect(state.error).toContain('Update failed');
   });
 
-  test('handle error', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        json: () => Promise.reject(new Error('Network error')),
-        ok: false
-      })
-    ) as jest.Mock;
-
-    const store = configureStore({
-      reducer: { user: userReducer }
+  test('logout user pending', () => {
+    const state = userReducer(initialState, {
+      type: 'user/logoutUser/pending'
     });
 
-    await store.dispatch(fetchUser());
+    expect(state.isLoading).toBe(true);
+    expect(state.error).toBeNull();
+  });
 
-    const { error, isLoading, isInitialState } = store.getState().user;
-    expect(isLoading).toBe(false);
-    expect(isInitialState).toBe(false);
-    expect(error).not.toBeNull();
+  test('logout user fulfilled', () => {
+    const stateWithUser = {
+      ...initialState,
+      user: mockUser
+    };
+    const state = userReducer(stateWithUser, {
+      type: 'user/logoutUser/fulfilled',
+      payload: { success: true }
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.error).toBeNull();
+  });
+
+  test('logout user rejected stores', () => {
+    const state = userReducer(initialState, {
+      type: 'user/logoutUser/rejected',
+      error: { message: 'Logout failed' }
+    });
+
+    expect(state.isLoading).toBe(false);
+    expect(state.error).toContain('Logout failed');
   });
 });
 
