@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
 import {
+  addBun,
   addIngredient,
   removeIngredientByIndex,
   moveIngredientUp,
@@ -40,6 +41,20 @@ const mockIngredient = {
   image: 'image.jpg',
   image_large: 'image_large.jpg',
   image_mobile: 'image_mobile.jpg'
+};
+
+const mockBun = {
+  _id: 'bun-1',
+  name: 'Булка',
+  type: 'bun' as const,
+  proteins: 80,
+  fat: 30,
+  carbohydrates: 40,
+  calories: 300,
+  price: 50,
+  image: 'bun.jpg',
+  image_large: 'bun_large.jpg',
+  image_mobile: 'bun_mobile.jpg'
 };
 
 const mockOrder = {
@@ -87,6 +102,38 @@ describe('async actions reducers', () => {
 });
 
 describe('burgerConstructor reducer', () => {
+  describe('addBun', () => {
+    it('should add bun to the constructor', () => {
+      const state = burgerConstructorReducer(initialState, addBun(mockBun));
+
+      expect(state.constructorItems.bun).toMatchObject(mockBun);
+    });
+
+    it('should replace existing bun with a new one', () => {
+      let state = burgerConstructorReducer(initialState, addBun(mockBun));
+      const firstBunId = state.constructorItems.bun?.id;
+
+      const anotherBun = {
+        ...mockBun,
+        _id: 'bun-2',
+        name: 'Другая булка'
+      };
+      state = burgerConstructorReducer(state, addBun(anotherBun));
+
+      expect(state.constructorItems.bun).toMatchObject(anotherBun);
+    });
+
+    it('should not affect ingredients when adding bun', () => {
+      let state = initialState;
+      state = burgerConstructorReducer(state, addIngredient(mockIngredient));
+      state = burgerConstructorReducer(state, addIngredient(mockIngredient));
+      state = burgerConstructorReducer(state, addBun(mockBun));
+
+      expect(state.constructorItems.ingredients).toHaveLength(2);
+      expect(state.constructorItems.bun).toMatchObject(mockBun);
+    });
+  });
+
   describe('addIngredient', () => {
     it('should add ingredient to the constructor', () => {
       const state = burgerConstructorReducer(
@@ -120,8 +167,6 @@ describe('burgerConstructor reducer', () => {
       state = burgerConstructorReducer(state, addIngredient(mockIngredient));
 
       expect(state.constructorItems.ingredients).toHaveLength(3);
-
-      const ingredientToRemove = state.constructorItems.ingredients[1];
 
       state = burgerConstructorReducer(state, removeIngredientByIndex(1));
 
