@@ -161,16 +161,32 @@ describe('burgerConstructor reducer', () => {
     it('should remove ingredient by index', () => {
       let state = burgerConstructorReducer(
         initialState,
-        addIngredient(mockIngredient)
+        addIngredient({ ...mockIngredient, _id: 'ingredient-1' })
       );
-      state = burgerConstructorReducer(state, addIngredient(mockIngredient));
-      state = burgerConstructorReducer(state, addIngredient(mockIngredient));
+      state = burgerConstructorReducer(
+        state,
+        addIngredient({ ...mockIngredient, _id: 'ingredient-2' })
+      );
+      state = burgerConstructorReducer(
+        state,
+        addIngredient({ ...mockIngredient, _id: 'ingredient-3' })
+      );
 
       expect(state.constructorItems.ingredients).toHaveLength(3);
+
+      const ingredientIds = state.constructorItems.ingredients.map(
+        (i) => i._id
+      );
+
+      expect(ingredientIds).toContain('ingredient-2');
 
       state = burgerConstructorReducer(state, removeIngredientByIndex(1));
 
       expect(state.constructorItems.ingredients).toHaveLength(2);
+      const afterDeleteIds = state.constructorItems.ingredients.map(
+        (i) => i._id
+      );
+      expect(afterDeleteIds).not.toContain('ingredient-2');
     });
   });
 
